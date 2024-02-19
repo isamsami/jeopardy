@@ -25,3 +25,5 @@ help:
 	@echo "Valid targets:"
 	@echo "  all:    generates all binary files"
 	@echo "  clean:  removes .o and .exe files"
+# to run open dir and run make
+# then use ./jeopardy.exe

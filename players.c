@@ -10,15 +10,19 @@
 #include <string.h>
 #include "players.h"
 
-// Returns true if the player name matches one of the existing players
-bool player_exists(player *players, int num_players, char *name)
+// Returns the index of the player if the player exists, otherwise returns -1
+int player_exists(player *players, int num_players, char *name)
 {
-    return false;
+    for (int i = 0; i < num_players; i++) {
+        if (strcmp(players[i].name, name) == 0) {
+            return i; // if player found return this index
+        }
+    }
+    return -1;
 }
 
-// Go through the list of players and update the score for the 
-// player given their name
-void update_score(player *players, int num_players, char *name, int score)
+// Update the score for the player given their index
+void update_score(player *players, int player_index, int score)
 {
-    
+    players[player_index].score += score;
 }
