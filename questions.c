@@ -27,6 +27,20 @@ void initialize_game(void)
     }
 }
 
+//initialize the find questions index
+void find_question_index(char *category, int value) 
+{
+    for (int i = 0; i < NUM_CATEGORIES * NUM_QUESTIONS_PER_CATEGORY; i++) {
+        if (strcmp(questions[i].category, category) == 0 &&
+            (i % NUM_QUESTIONS_PER_CATEGORY + 1) * 100 == value &&
+            !questions[i].answered) {
+            return i; // Return the index of the question if found
+        }
+    }
+    return -1; // Return -1 if the question is not found
+}
+
+
 // Displays each of the remaining categories and question dollar values that have not been answered
 void display_categories(void)
 {
@@ -103,3 +117,19 @@ bool already_answered(char *category, int value)
         return false;
     }
 }
+
+// Function to check if a question has already been answered
+bool is_question_answered(int index) {
+    return questions[index].answered;
+}
+
+// Function to mark a question as answered
+void mark_question_as_answered(int index) {
+    questions[index].answered = true;
+}
+
+// Function to get the correct answer for a question
+char* get_answer_text(int index) {
+    return questions[index].answer;
+}
+

@@ -24,7 +24,9 @@ void show_results(player *players, int num_players);
 int main(int argc, char *argv[]) {
     player players[NUM_PLAYERS];
     char buffer[BUFFER_LEN] = {0};
-    initialize_game();
+
+    initialize_questions(); // Initialize questions
+    initialize_players(players, NUM_PLAYERS); // Initialize players
 
     printf("Enter the names of the four players:\n");
     for (int i = 0; i < NUM_PLAYERS; i++) {
@@ -35,15 +37,12 @@ int main(int argc, char *argv[]) {
         players[i].score = 0;
     }
 
-    // Initialize questions
-    initialize_questions();
-
     int total_questions = NUM_CATEGORIES * NUM_QUESTIONS_PER_CATEGORY;
     int answered_questions = 0;
 
     while (answered_questions < total_questions) {
         // Display categories and questions
-        display_categories_and_questions();
+        display_categories();
 
         // Prompt for player's name
         printf("Enter the name of the player who picks the question: ");
@@ -51,7 +50,7 @@ int main(int argc, char *argv[]) {
         strtok(buffer, "\n");
 
         // Validate player's name
-        int player_index = get_player_index(buffer, players, NUM_PLAYERS);
+        int player_index = player_exists(players, NUM_PLAYERS, buffer);
         if (player_index == -1) {
             printf("Invalid player name. Try again.\n");
             continue;
@@ -72,8 +71,7 @@ int main(int argc, char *argv[]) {
         }
 
         // Display the question
-        char *question_text = get_question_text(question_index);
-        printf("\n%s\n", question_text);
+        display_question(category, amount);
 
         // Prompt for player's answer
         printf("Your answer (start with 'what is' or 'who is'): ");
@@ -81,10 +79,10 @@ int main(int argc, char *argv[]) {
         strtok(buffer, "\n");
 
         // Validate and process the answer
-        bool correct = check_answer(question_index, buffer);
+        bool correct = valid_answer(category, amount, buffer);
         if (correct) {
             printf("Correct!\n");
-            players[player_index].score += amount;
+            update_score(players, player_index, amount);
         } else {
             printf("Incorrect! The correct answer is: %s\n", get_answer_text(question_index));
         }
@@ -112,15 +110,7 @@ void tokenize(char *input, char **tokens) {
 
 void show_results(player *players, int num_players) {
     // Sort players based on their scores
-    for (int i = 0; i < num_players - 1; i++) {
-        for (int j = i + 1; j < num_players; j++) {
-            if (players[i].score < players[j].score) {
-                player temp = players[i];
-                players[i] = players[j];
-                players[j] = temp;
-            }
-        }
-    }
+    sort_players(players, num_players);
 
     // Print leaderboard
     printf("\nLeaderboard:\n");

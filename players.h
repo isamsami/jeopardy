@@ -23,6 +23,6 @@ extern int player_exists(player *players, int num_players, char *name);
 
 // Go through the list of players and update the score for the 
 // player given their name
-extern void update_score(player *players, int num_players, char *name, int score);
+extern void update_score(player *players, int num_players, int score);
 
 #endif /* PLAYERS_H_ */
