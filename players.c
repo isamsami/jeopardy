@@ -10,6 +10,15 @@
 #include <string.h>
 #include "players.h"
 
+int player_exists(player *players, int num_players, char *name) {
+    for (int i = 0; i < num_players; i++) {
+        if (strcmp(players[i].name, name) == 0) {
+            return i; // Return the index of the player if found
+        }
+    }
+    return -1; // Return -1 if the player is not found
+}
+
 // Returns the index of the player if the player exists, otherwise returns -1
 int player_exists(player *players, int num_players, char *name)
 {
