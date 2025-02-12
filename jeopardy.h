@@ -1,9 +1,5 @@
 /*
- * Tutorial 4 Jeopardy Project for SOFE 3950U / CSCI 3020U: Operating Systems
- *
- * Copyright (C) 2015, <GROUP MEMBERS>
- * All rights reserved.
- *
+ * Tutorial 4 Jeopardy Project for SOFE 3950U (Operating Systems)
  */
 #ifndef JEOPARDY_H_
 #define JEOPARDY_H_
