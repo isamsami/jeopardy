@@ -6,6 +6,8 @@
 
 #define MAX_LEN 256
 
+#include "players.h"
+
 // Processes the answer from the user containing what is or who is and tokenizes it to retrieve the answer.
 extern void tokenize(char *input, char **tokens);
 
