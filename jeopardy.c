@@ -3,116 +3,70 @@
  *
  */
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #include "questions.h"
 #include "players.h"
-#include "jeopardy.h"
 
-#define BUFFER_LEN 256
-#define NUM_PLAYERS 4
-#define NUM_CATEGORIES 3
-#define NUM_QUESTIONS_PER_CATEGORY 3
+void tokenize(char *input, char **tokens) {
+    tokens[0] = strtok(input, " ");
+    tokens[1] = strtok(NULL, " ");
+    tokens[2] = strtok(NULL, ""); // Capture the rest of the string
+}
 
-void tokenize(char *input, char **tokens);
-void show_results(player *players, int num_players);
+int main() {
+    srand(time(NULL));
+    initialize_players();
+    initialize_game();
 
-int main(int argc, char *argv[]) {
-    player players[NUM_PLAYERS];
-    char buffer[BUFFER_LEN] = {0};
+    char player_name[50];
+    char category[50];
+    int value;
+    char answer[256];
 
-    initialize_questions(); // Initialize questions
-    initialize_players(players, NUM_PLAYERS); // Initialize players
-
-    printf("Enter the names of the four players:\n");
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        printf("Player %d: ", i + 1);
-        fgets(buffer, BUFFER_LEN, stdin);
-        strtok(buffer, "\n"); // Remove the newline character
-        strcpy(players[i].name, buffer);
-        players[i].score = 0;
-    }
-
-    int total_questions = NUM_CATEGORIES * NUM_QUESTIONS_PER_CATEGORY;
-    int answered_questions = 0;
-
-    while (answered_questions < total_questions) {
-        // Display categories and questions
+    while (1) {
         display_categories();
+        printf("\nEnter player's name to select a question (or type 'exit' to quit): ");
+        scanf("%49s", player_name);
 
-        // Prompt for player's name
-        printf("Enter the name of the player who picks the question: ");
-        fgets(buffer, BUFFER_LEN, stdin);
-        strtok(buffer, "\n");
+        if (strcmp(player_name, "exit") == 0) {
+            break;
+        }
 
-        // Validate player's name
-        int player_index = player_exists(players, NUM_PLAYERS, buffer);
-        if (player_index == -1) {
+        if (!player_exists(player_name)) {
             printf("Invalid player name. Try again.\n");
             continue;
         }
 
-        // Prompt for category and dollar amount
-        char category[BUFFER_LEN];
-        int amount;
-        printf("Enter the category and dollar amount (e.g., 'Science 100'): ");
-        fgets(buffer, BUFFER_LEN, stdin);
-        sscanf(buffer, "%s %d", category, &amount);
+        printf("Enter category and value (e.g., Anime 100): ");
+        scanf(" %49s %d", category, &value);
 
-        // Find and ask the question
-        int question_index = find_question_index(category, amount);
-        if (question_index == -1 || is_question_answered(question_index)) {
-            printf("Invalid category or dollar amount. Try again.\n");
+        if (already_answered(category, value)) {
+            printf("This question has already been answered!\n");
             continue;
         }
 
-        // Display the question
-        display_question(category, amount);
+        display_question(category, value);
+        printf("\n%s, enter your answer (start with 'What is' or 'Who is') or type 'skip' to pass: ", player_name);
+        scanf(" %[^"]255[^"]s", answer);
 
-        // Prompt for player's answer
-        printf("Your answer (start with 'what is' or 'who is'): ");
-        fgets(buffer, BUFFER_LEN, stdin);
-        strtok(buffer, "\n");
-
-        // Validate and process the answer
-        bool correct = valid_answer(category, amount, buffer);
-        if (correct) {
-            printf("Correct!\n");
-            update_score(players, player_index, amount);
-        } else {
-            printf("Incorrect! The correct answer is: %s\n", get_answer_text(question_index));
+        if (strcmp(answer, "skip") == 0) {
+            printf("Question skipped!\n");
+            continue;
         }
 
-        // Mark the question as answered
-        mark_question_as_answered(question_index);
-        answered_questions++;
+        char *tokens[3] = {NULL, NULL, NULL};
+        tokenize(answer, tokens);
+
+        if (tokens[2] != NULL && valid_answer(category, value, tokens[2])) {
+            printf("✅ Correct!\n");
+            update_score(player_name, value);
+        } else {
+            printf("❌ Incorrect!\n");
+        }
     }
 
-    // Display final results
-    show_results(players, NUM_PLAYERS);
-
-    return EXIT_SUCCESS;
+    show_results();
+    return 0;
 }
-
-void tokenize(char *input, char **tokens) {
-    // Tokenize the input string and store the tokens in the tokens array
-    char *token = strtok(input, " ");
-    int i = 0;
-    while (token != NULL) {
-        tokens[i++] = token;
-        token = strtok(NULL, " ");
-    }
-}
-
-void show_results(player *players, int num_players) {
-    // Sort players based on their scores
-    sort_players(players, num_players);
-
-    // Print leaderboard
-    printf("\nLeaderboard:\n");
-    for (int i = 0; i < num_players; i++) {
-        printf("%d. %s - $%d\n", i + 1, players[i].name, players[i].score);
-    }
-}
-
