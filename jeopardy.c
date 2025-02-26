@@ -29,6 +29,7 @@ int main() {
         display_categories();
         printf("\nEnter player's name to select a question (or type 'exit' to quit): ");
         scanf("%49s", player_name);
+        getchar(); // Clear leftover newline from buffer
 
         if (strcmp(player_name, "exit") == 0) {
             break;
@@ -40,7 +41,13 @@ int main() {
         }
 
         printf("Enter category and value (e.g., Anime 100): ");
-        scanf(" %49s %d", category, &value);
+        fgets(category, sizeof(category), stdin);
+        category[strcspn(category, "\n")] = 0; // Remove newline
+        
+        if (sscanf(category, "%49s %d", category, &value) != 2) {
+            printf("Invalid input format. Try again.\n");
+            continue;
+        }
 
         if (already_answered(category, value)) {
             printf("This question has already been answered!\n");
@@ -49,7 +56,8 @@ int main() {
 
         display_question(category, value);
         printf("\n%s, enter your answer (start with 'What is' or 'Who is') or type 'skip' to pass: ", player_name);
-        scanf(" %[^"]255[^"]s", answer);
+        fgets(answer, sizeof(answer), stdin);
+        answer[strcspn(answer, "\n")] = 0; // Remove trailing newline
 
         if (strcmp(answer, "skip") == 0) {
             printf("Question skipped!\n");
